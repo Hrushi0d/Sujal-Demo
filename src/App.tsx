@@ -6,7 +6,6 @@ import { SuggestionCards } from "@/components/SuggestionCards";
 import { ChatMessages } from "@/components/ChatMessages";
 import { GeneratedUIPreview } from "@/components/GeneratedUIPreview";
 import { ApiKeyPill } from "@/components/ApiKeyPill";
-import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { useChat } from "@/hooks/useChat";
 import { useLLMConfig, providerLabel } from "@/lib/llm";
@@ -51,9 +50,8 @@ export default function App() {
 
   return (
     <div className="relative flex h-full min-h-0 flex-col">
-      {/* Top toolbar — logo left, theme + new on right */}
-      <div className="flex items-center justify-between px-5 py-4">
-        <Logo className="h-7 w-7 text-foreground/85" />
+      {/* Top toolbar — theme + new on right */}
+      <div className="flex items-center justify-end px-5 py-4">
         <div className="flex items-center gap-2">
           {!empty && (
             <button
@@ -87,17 +85,19 @@ export default function App() {
 
       {empty ? (
         <main className="flex flex-1 flex-col items-center justify-center px-4 pb-32">
-          <div className="flex w-full max-w-[760px] flex-col items-center gap-6">
+          <div className="flex w-full max-w-[760px] flex-col items-center">
             <WelcomeHeader />
-            <ChatComposer
-              value={draft}
-              onChange={setDraft}
-              onSubmit={handleSubmit}
-              isStreaming={isStreaming}
-              autoFocus
-              className="w-full max-w-[680px]"
-            />
-            <SuggestionCards onPick={handlePick} className="mt-1" />
+            <div className="mt-6 flex w-full max-w-[680px] flex-col gap-2">
+              <ChatComposer
+                value={draft}
+                onChange={setDraft}
+                onSubmit={handleSubmit}
+                isStreaming={isStreaming}
+                autoFocus
+                className="w-full"
+              />
+              <SuggestionCards onPick={handlePick} />
+            </div>
           </div>
         </main>
       ) : (

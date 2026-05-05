@@ -30,7 +30,7 @@ interface SuggestionCardsProps {
 
 export function SuggestionCards({ onPick, className }: SuggestionCardsProps) {
   return (
-    <div className={cn("flex flex-wrap items-center justify-center gap-2", className)}>
+    <div className={cn("flex flex-wrap items-center justify-start gap-2", className)}>
       {SUGGESTIONS.map((s) => (
         <button
           key={s.title}

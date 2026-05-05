@@ -27,14 +27,6 @@ export function ChatComposer({
   const cfg = useLLMConfig();
   const [pickerOpen, setPickerOpen] = React.useState(false);
 
-  React.useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.style.height = "0px";
-    const max = 24 * 7 + 16;
-    el.style.height = Math.min(el.scrollHeight, max) + "px";
-  }, [value]);
-
   const handleKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -47,8 +39,7 @@ export function ChatComposer({
   return (
     <div
       className={cn(
-        "pill-surface composer-glow relative w-full rounded-3xl px-5 pb-3 pt-4",
-        "transition-shadow",
+        "pill-surface composer-glow relative flex h-[132px] w-full flex-col rounded-lg p-3 transition-shadow",
         className
       )}
     >
@@ -58,10 +49,10 @@ export function ChatComposer({
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKey}
         placeholder={placeholder}
-        rows={1}
         autoFocus={autoFocus}
+        className="h-full flex-1 resize-none"
       />
-      <div className="mt-3 flex items-center justify-between">
+      <div className="mt-2 flex items-center justify-between">
         {/* Provider · Model picker chip */}
         <div className="relative">
           <button
