@@ -40,7 +40,7 @@ export function ChatMessages({
           )}
         >
           {m.role === "user" ? (
-            <div className="surface max-w-[80%] rounded-2xl rounded-br-md px-4 py-2.5 text-[14px] leading-snug text-foreground">
+            <div className="chip-surface max-w-[80%] rounded-2xl rounded-br-md px-4 py-2.5 text-[14px] leading-snug text-foreground">
               {m.content}
             </div>
           ) : m.errorText ? (
@@ -54,7 +54,7 @@ export function ChatMessages({
               </button>
             </div>
           ) : m.isStreaming && !m.content ? (
-            <div className="surface flex items-center gap-2 self-start rounded-xl px-4 py-3 text-muted-foreground">
+            <div className="pill-surface flex items-center gap-2 self-start rounded-xl px-4 py-3 text-muted-foreground">
               <span className="text-[13px]">Composing components</span>
               <StreamingDots />
             </div>

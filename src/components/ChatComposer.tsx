@@ -1,7 +1,7 @@
 import * as React from "react";
-import { ArrowUp, Paperclip, Sparkles, ChevronDown } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { useLLMConfig, providerLabel, PROVIDERS } from "@/lib/llm";
 import { cn } from "@/lib/utils";
 
 interface ChatComposerProps {
@@ -19,11 +19,13 @@ export function ChatComposer({
   onChange,
   onSubmit,
   isStreaming,
-  placeholder = "Describe a UI…",
+  placeholder = "Search for the web as would normally do.",
   autoFocus,
   className,
 }: ChatComposerProps) {
   const ref = React.useRef<HTMLTextAreaElement>(null);
+  const cfg = useLLMConfig();
+  const [pickerOpen, setPickerOpen] = React.useState(false);
 
   React.useEffect(() => {
     const el = ref.current;
@@ -45,8 +47,7 @@ export function ChatComposer({
   return (
     <div
       className={cn(
-        "surface composer-glow w-full rounded-2xl px-4 pb-3 pt-3.5",
-        "shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_10px_30px_-12px_rgba(0,0,0,0.45)]",
+        "pill-surface composer-glow relative w-full rounded-3xl px-5 pb-3 pt-4",
         "transition-shadow",
         className
       )}
@@ -60,43 +61,140 @@ export function ChatComposer({
         rows={1}
         autoFocus={autoFocus}
       />
-      <div className="mt-2 flex items-center justify-between">
-        <button
-          type="button"
-          className="flex h-7 items-center gap-1.5 rounded-md px-2 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-          tabIndex={-1}
-        >
-          <Sparkles className="h-3.5 w-3.5 text-emerald-300/80" />
-          <span>Skills</span>
-          <ChevronDown className="h-3 w-3" />
-        </button>
-
-        <div className="flex items-center gap-1">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-muted-foreground"
-            tabIndex={-1}
-          >
-            <Paperclip className="h-4 w-4" />
-          </Button>
+      <div className="mt-3 flex items-center justify-between">
+        {/* Provider · Model picker chip */}
+        <div className="relative">
           <button
             type="button"
-            disabled={!canSend}
-            onClick={onSubmit}
-            aria-label="Send"
-            className={cn(
-              "relative inline-flex h-8 w-8 items-center justify-center rounded-full transition-all",
-              "disabled:opacity-40 disabled:cursor-not-allowed",
-              canSend
-                ? "gradient-brand text-black shadow-[0_0_18px_-2px_rgba(16,185,129,0.55)] hover:brightness-110"
-                : "bg-white/[0.06] text-muted-foreground"
-            )}
+            onClick={() => setPickerOpen((v) => !v)}
+            className="inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-[12.5px] text-muted-foreground transition-colors hover:text-foreground"
           >
-            <ArrowUp className="h-4 w-4" strokeWidth={2.4} />
+            <span className="font-medium text-foreground/85">
+              {providerLabel(cfg.provider)}
+            </span>
+            <span className="opacity-40">·</span>
+            <span className="font-mono text-[11.5px] opacity-70">
+              {cfg.model}
+            </span>
+            <svg
+              viewBox="0 0 12 12"
+              className={cn(
+                "ml-0.5 h-3 w-3 transition-transform",
+                pickerOpen && "rotate-180"
+              )}
+              aria-hidden
+            >
+              <path
+                d="M3 4.5 L6 7.5 L9 4.5"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                fill="none"
+              />
+            </svg>
           </button>
+
+          {pickerOpen && (
+            <ModelPicker onClose={() => setPickerOpen(false)} />
+          )}
+        </div>
+
+        <button
+          type="button"
+          disabled={!canSend}
+          onClick={onSubmit}
+          aria-label="Send"
+          className={cn(
+            "relative inline-flex h-9 w-9 items-center justify-center rounded-full transition-all",
+            canSend
+              ? "bg-primary text-primary-foreground hover:opacity-90"
+              : "bg-secondary text-muted-foreground"
+          )}
+        >
+          <ArrowUp className="h-4 w-4" strokeWidth={2.2} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ModelPicker({ onClose }: { onClose: () => void }) {
+  const cfg = useLLMConfig();
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const onDoc = (e: MouseEvent) => {
+      if (!ref.current) return;
+      if (!ref.current.contains(e.target as Node)) onClose();
+    };
+    document.addEventListener("mousedown", onDoc);
+    const onEsc = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, [onClose]);
+
+  const meta = PROVIDERS[cfg.provider];
+
+  return (
+    <div
+      ref={ref}
+      className="pill-surface absolute bottom-full left-0 z-30 mb-2 w-[320px] space-y-3 rounded-2xl p-3 shadow-lg"
+    >
+      <div>
+        <Label>Provider</Label>
+        <div className="mt-1.5 grid grid-cols-3 gap-1">
+          {Object.values(PROVIDERS).map((p) => (
+            <button
+              key={p.id}
+              type="button"
+              onClick={() => cfg.setProvider(p.id)}
+              className={cn(
+                "rounded-md border px-2 py-1.5 text-[11.5px] font-medium transition-colors",
+                cfg.provider === p.id
+                  ? "border-foreground/20 bg-secondary text-foreground"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground"
+              )}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div>
+        <Label>Model</Label>
+        <input
+          value={cfg.model}
+          onChange={(e) => cfg.setModel(e.target.value)}
+          placeholder={meta.defaultModel}
+          spellCheck={false}
+          autoComplete="off"
+          className="mt-1.5 h-8 w-full rounded-md border border-border bg-card px-2 font-mono text-[11.5px] text-foreground placeholder:text-muted-foreground focus:border-foreground/20 focus:outline-none"
+        />
+        <div className="mt-1.5 flex flex-wrap gap-1">
+          {meta.exampleModels.slice(0, 4).map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => cfg.setModel(m)}
+              className="rounded-md border border-border bg-card px-1.5 py-0.5 font-mono text-[10.5px] text-muted-foreground transition-colors hover:border-foreground/20 hover:text-foreground"
+            >
+              {m}
+            </button>
+          ))}
         </div>
       </div>
     </div>
+  );
+}
+
+function Label({ children }: { children: React.ReactNode }) {
+  return (
+    <label className="text-[10.5px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
+      {children}
+    </label>
   );
 }

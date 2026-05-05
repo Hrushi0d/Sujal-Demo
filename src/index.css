@@ -3,7 +3,34 @@
 @tailwind utilities;
 
 @layer base {
+  /* ---------------- Light theme (default) ----------------
+     Palette pulled from landing.png: warm cream background,
+     white pill surfaces, dark charcoal text. */
   :root {
+    --background: 45 30% 94%;          /* cream  #F4F1E8 */
+    --foreground: 30 4% 21%;           /* charcoal #373735 */
+    --card: 0 0% 100%;                 /* pure white surfaces */
+    --card-foreground: 30 4% 21%;
+    --primary: 30 4% 21%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 45 25% 90%;
+    --secondary-foreground: 30 4% 21%;
+    --muted: 45 25% 90%;
+    --muted-foreground: 30 4% 50%;     /* #888581 */
+    --accent: 45 25% 92%;
+    --accent-foreground: 30 4% 21%;
+    --border: 45 25% 86%;              /* #E8E2D2 */
+    --input: 0 0% 100%;
+    --ring: 30 4% 60%;
+    --radius: 0.875rem;
+
+    /* Brand accent — softer warm grey on light to stay editorial */
+    --brand-from: 30 4% 21%;
+    --brand-to: 30 4% 35%;
+  }
+
+  /* ---------------- Dark theme (override via .dark on <html>) ---------------- */
+  .dark {
     --background: 0 0% 4%;
     --foreground: 0 0% 96%;
     --card: 0 0% 6%;
@@ -19,9 +46,6 @@
     --border: 0 0% 100% / 0.08;
     --input: 0 0% 100% / 0.06;
     --ring: 0 0% 100% / 0.18;
-    --radius: 0.875rem;
-
-    /* Brand accent (subtle emerald → cyan) */
     --brand-from: 152 76% 56%;
     --brand-to: 188 86% 60%;
   }
@@ -32,50 +56,55 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    background-color: #0a0a0a;
-    background-image:
-      radial-gradient(1200px circle at 10% -10%, rgba(16,185,129,0.05), transparent 40%),
-      radial-gradient(900px circle at 110% 110%, rgba(56,189,248,0.04), transparent 45%);
-    background-attachment: fixed;
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
       "Helvetica Neue", Arial, sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
+  /* Light mode soft halo (very subtle warm) */
+  body {
+    background-image:
+      radial-gradient(1200px circle at 10% -10%, rgba(0, 0, 0, 0.025), transparent 40%),
+      radial-gradient(900px circle at 110% 110%, rgba(0, 0, 0, 0.02), transparent 45%);
+    background-attachment: fixed;
+  }
+
+  .dark body {
+    background-image:
+      radial-gradient(1200px circle at 10% -10%, rgba(255, 255, 255, 0.04), transparent 40%),
+      radial-gradient(900px circle at 110% 110%, rgba(255, 255, 255, 0.03), transparent 45%);
+  }
+
   ::selection {
-    background-color: rgba(16, 185, 129, 0.22);
+    background-color: hsl(var(--foreground) / 0.18);
   }
 
   ::-webkit-scrollbar { width: 10px; height: 10px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.06);
+    background: hsl(var(--foreground) / 0.10);
     border-radius: 8px;
   }
-  ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.12); }
+  ::-webkit-scrollbar-thumb:hover { background: hsl(var(--foreground) / 0.20); }
 }
 
 @layer utilities {
-  .border-hairline {
-    border: 1px solid rgba(255, 255, 255, 0.08);
+  /* "Pill" surface — pure white in light, soft dark in dark mode. */
+  .pill-surface {
+    background-color: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    box-shadow: 0 1px 1px hsl(var(--foreground) / 0.02);
   }
-  .border-hairline-strong {
-    border: 1px solid rgba(255, 255, 255, 0.14);
+  .dark .pill-surface {
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset;
   }
-  .surface {
-    background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01));
-    border: 1px solid rgba(255, 255, 255, 0.07);
+  .pill-hover:hover {
+    border-color: hsl(var(--foreground) / 0.18);
   }
-  .surface-hover:hover {
-    background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
-    border-color: rgba(255, 255, 255, 0.14);
-  }
-  .gradient-brand {
-    background-image: linear-gradient(
-      135deg,
-      hsl(var(--brand-from)) 0%,
-      hsl(var(--brand-to)) 100%
-    );
+  /* Subtle "ghost" surface for chip-like controls. */
+  .chip-surface {
+    background-color: hsl(var(--secondary));
+    border: 1px solid hsl(var(--border));
   }
   .gradient-text-brand {
     background-image: linear-gradient(
@@ -87,35 +116,11 @@
     background-clip: text;
     color: transparent;
   }
-  .ring-focus {
-    @apply ring-1 ring-white/20;
-  }
-}
-
-/* Halo behind welcome heading — emerald-tinged radial */
-.welcome-halo {
-  position: absolute;
-  inset: -120px 0 0 0;
-  pointer-events: none;
-  z-index: 0;
-  background:
-    radial-gradient(
-      640px circle at 50% 38%,
-      rgba(16, 185, 129, 0.10),
-      rgba(255, 255, 255, 0) 70%
-    ),
-    radial-gradient(
-      420px circle at 50% 36%,
-      rgba(255, 255, 255, 0.06),
-      rgba(255, 255, 255, 0) 70%
-    );
 }
 
 .composer-glow:focus-within {
-  border-color: rgba(255, 255, 255, 0.16);
-  box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.05),
-    0 0 24px -4px rgba(16, 185, 129, 0.25);
+  border-color: hsl(var(--foreground) / 0.18);
+  box-shadow: 0 4px 18px -8px hsl(var(--foreground) / 0.10);
 }
 
 .openui-render {

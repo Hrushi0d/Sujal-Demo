@@ -36,8 +36,8 @@ export const SheetContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed z-50 flex flex-col gap-3 bg-[#0a0a0a] shadow-xl transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out",
-        "border-l border-hairline",
+        "fixed z-50 flex flex-col gap-3 bg-card shadow-xl transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out",
+        "border-l border-border",
         side === "right" &&
           "inset-y-0 right-0 h-full w-full max-w-[860px] data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
         side === "bottom" &&

@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { Renderer } from "@openuidev/react-lang";
-import { ThemeProvider, defaultDarkTheme } from "@openuidev/react-ui";
+import {
+  ThemeProvider,
+  defaultDarkTheme,
+  defaultLightTheme,
+} from "@openuidev/react-ui";
 import { Maximize2, Copy, Check, RefreshCw, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { library } from "@/lib/openui";
+import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
 interface ResultCardProps {
@@ -22,6 +27,7 @@ export function ResultCard({
   className,
 }: ResultCardProps) {
   const [copied, setCopied] = useState(false);
+  const { mode } = useTheme();
 
   const handleCopy = async () => {
     if (!source) return;
@@ -39,12 +45,11 @@ export function ResultCard({
   return (
     <div
       className={cn(
-        "surface relative overflow-hidden rounded-2xl",
-        "shadow-[0_1px_0_rgba(255,255,255,0.04)_inset,0_8px_32px_-12px_rgba(0,0,0,0.6)]",
+        "pill-surface relative overflow-hidden rounded-2xl",
         className
       )}
     >
-      <div className="flex items-center justify-between border-b border-white/[0.06] px-4 py-2.5">
+      <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
         <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
           <span className="relative flex h-1.5 w-1.5">
             {isStreaming && (
@@ -101,7 +106,11 @@ export function ResultCard({
       </div>
 
       <div className="openui-render relative max-h-[640px] overflow-y-auto">
-        <ThemeProvider mode="dark" darkTheme={defaultDarkTheme}>
+        <ThemeProvider
+          mode={mode}
+          lightTheme={defaultLightTheme}
+          darkTheme={defaultDarkTheme}
+        >
           {showSkeleton ? (
             <div className="flex items-center justify-center px-6 py-16 text-muted-foreground">
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

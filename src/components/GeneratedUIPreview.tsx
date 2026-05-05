@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { Renderer } from "@openuidev/react-lang";
-import { ThemeProvider, defaultDarkTheme } from "@openuidev/react-ui";
+import {
+  ThemeProvider,
+  defaultDarkTheme,
+  defaultLightTheme,
+} from "@openuidev/react-ui";
 import { Copy, Check, Sparkles, Code2 } from "lucide-react";
+import { useTheme } from "@/lib/theme";
 import {
   Sheet,
   SheetContent,
@@ -32,6 +37,7 @@ export function GeneratedUIPreview({
 }: GeneratedUIPreviewProps) {
   const [tab, setTab] = useState<Tab>("preview");
   const [copied, setCopied] = useState(false);
+  const { mode } = useTheme();
 
   const handleCopy = async () => {
     if (!source) return;
@@ -58,7 +64,7 @@ export function GeneratedUIPreview({
             </SheetDescription>
           ) : null}
           <div className="mt-3 flex items-center justify-between">
-            <div className="inline-flex rounded-lg border border-white/[0.06] bg-white/[0.015] p-0.5">
+            <div className="inline-flex rounded-lg border border-border bg-secondary p-0.5">
               <TabBtn active={tab === "preview"} onClick={() => setTab("preview")}>
                 <Sparkles className="mr-1 h-3 w-3" />
                 Preview
@@ -88,7 +94,11 @@ export function GeneratedUIPreview({
         <div className="flex-1 overflow-y-auto">
           {tab === "preview" ? (
             <div className="openui-render px-6 pb-10 pt-2">
-              <ThemeProvider mode="dark" darkTheme={defaultDarkTheme}>
+              <ThemeProvider
+                mode={mode}
+                lightTheme={defaultLightTheme}
+                darkTheme={defaultDarkTheme}
+              >
                 {source ? (
                   <Renderer
                     response={source}
@@ -101,7 +111,7 @@ export function GeneratedUIPreview({
               </ThemeProvider>
             </div>
           ) : (
-            <pre className="m-6 max-h-[calc(100vh-180px)] overflow-auto rounded-xl border border-white/[0.06] bg-black/40 px-4 py-4 text-[12px] leading-relaxed text-foreground/90">
+            <pre className="m-6 max-h-[calc(100vh-180px)] overflow-auto rounded-xl border border-border bg-secondary/60 px-4 py-4 text-[12px] leading-relaxed text-foreground/90">
               <code>{source ?? "(empty)"}</code>
             </pre>
           )}
@@ -126,7 +136,7 @@ function TabBtn({
       className={cn(
         "inline-flex h-7 items-center rounded-md px-2.5 text-[12px] font-medium transition-colors",
         active
-          ? "bg-white/[0.06] text-foreground"
+          ? "bg-card text-foreground"
           : "text-muted-foreground hover:text-foreground"
       )}
     >

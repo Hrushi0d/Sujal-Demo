@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import type { ChatMessage } from "@/types";
-import { streamGenerate, humanizeError } from "@/lib/llm";
+import { streamGenerate, humanizeError, useLLMConfig } from "@/lib/llm";
 import { getSystemPrompt, extractOpenUI } from "@/lib/openui";
 
 function uid() {
@@ -8,6 +8,7 @@ function uid() {
 }
 
 export function useChat() {
+  const { config, provider } = useLLMConfig();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
@@ -17,6 +18,22 @@ export function useChat() {
       userPrompt: string,
       historyForLLM: Array<{ role: "user" | "assistant"; content: string }>
     ) => {
+      if (!config) {
+        const id = uid();
+        setMessages((prev) => [
+          ...prev,
+          {
+            id,
+            role: "assistant",
+            content: "",
+            isStreaming: false,
+            errorText:
+              "No LLM configured. Pick a provider and paste an API key in the bar above the composer.",
+          },
+        ]);
+        return null;
+      }
+
       const assistantId = uid();
       const placeholder: ChatMessage = {
         id: assistantId,
@@ -31,7 +48,7 @@ export function useChat() {
       abortRef.current = ctrl;
 
       try {
-        const full = await streamGenerate({
+        const full = await streamGenerate(config, {
           systemPrompt: getSystemPrompt(),
           history: historyForLLM,
           userPrompt,
@@ -57,7 +74,7 @@ export function useChat() {
         );
         return assistantId;
       } catch (err) {
-        const msg = humanizeError(err);
+        const msg = humanizeError(err, provider);
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantId
@@ -71,7 +88,7 @@ export function useChat() {
         abortRef.current = null;
       }
     },
-    []
+    [config, provider]
   );
 
   const send = useCallback(
