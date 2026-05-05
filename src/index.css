@@ -1,0 +1,123 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 4%;
+    --foreground: 0 0% 96%;
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 96%;
+    --primary: 0 0% 96%;
+    --primary-foreground: 0 0% 8%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 92%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 56%;
+    --accent: 0 0% 14%;
+    --accent-foreground: 0 0% 96%;
+    --border: 0 0% 100% / 0.08;
+    --input: 0 0% 100% / 0.06;
+    --ring: 0 0% 100% / 0.18;
+    --radius: 0.875rem;
+
+    /* Brand accent (subtle emerald → cyan) */
+    --brand-from: 152 76% 56%;
+    --brand-to: 188 86% 60%;
+  }
+
+  html, body, #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-color: #0a0a0a;
+    background-image:
+      radial-gradient(1200px circle at 10% -10%, rgba(16,185,129,0.05), transparent 40%),
+      radial-gradient(900px circle at 110% 110%, rgba(56,189,248,0.04), transparent 45%);
+    background-attachment: fixed;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  ::selection {
+    background-color: rgba(16, 185, 129, 0.22);
+  }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.12); }
+}
+
+@layer utilities {
+  .border-hairline {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .border-hairline-strong {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+  }
+  .surface {
+    background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.01));
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+  .surface-hover:hover {
+    background: linear-gradient(180deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
+    border-color: rgba(255, 255, 255, 0.14);
+  }
+  .gradient-brand {
+    background-image: linear-gradient(
+      135deg,
+      hsl(var(--brand-from)) 0%,
+      hsl(var(--brand-to)) 100%
+    );
+  }
+  .gradient-text-brand {
+    background-image: linear-gradient(
+      90deg,
+      hsl(var(--brand-from)) 0%,
+      hsl(var(--brand-to)) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .ring-focus {
+    @apply ring-1 ring-white/20;
+  }
+}
+
+/* Halo behind welcome heading — emerald-tinged radial */
+.welcome-halo {
+  position: absolute;
+  inset: -120px 0 0 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(
+      640px circle at 50% 38%,
+      rgba(16, 185, 129, 0.10),
+      rgba(255, 255, 255, 0) 70%
+    ),
+    radial-gradient(
+      420px circle at 50% 36%,
+      rgba(255, 255, 255, 0.06),
+      rgba(255, 255, 255, 0) 70%
+    );
+}
+
+.composer-glow:focus-within {
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    0 0 24px -4px rgba(16, 185, 129, 0.25);
+}
+
+.openui-render {
+  color: hsl(var(--foreground));
+}
